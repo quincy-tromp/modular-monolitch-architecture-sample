@@ -30,7 +30,7 @@ public sealed class User : Entity
             Email = email,
             FirstName = firstName,
             LastName = lastName,
-            IdentityId = identityId
+            IdentityId = identityId,
         };
 
         user._roles.Add(Role.Member);

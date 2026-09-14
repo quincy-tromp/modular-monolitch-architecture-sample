@@ -7,7 +7,7 @@ namespace Evently.Modules.Users.ArchitectureTests.Presentation;
 public class PresentationTests : BaseTest
 {
     [Fact]
-    public void IntegrationEventHandler_Should_BeSealed()
+    public void IntegrationEventConsumer_Should_BeSealed()
     {
         Types.InAssembly(PresentationAssembly)
             .That()
@@ -19,13 +19,13 @@ public class PresentationTests : BaseTest
     }
 
     [Fact]
-    public void IntegrationEventHandler_ShouldHave_NameEndingWith_DomainEventHandler()
+    public void IntegrationEventConsumer_ShouldHave_NameEndingWith_IntegrationEventConsumer()
     {
         Types.InAssembly(PresentationAssembly)
             .That()
             .ImplementInterface(typeof(IConsumer<>))
             .Should()
-            .HaveNameEndingWith("Consumer")
+            .HaveNameEndingWith("IntegrationEventConsumer")
             .GetResult()
             .ShouldBeSuccessful();
     }
