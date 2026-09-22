@@ -2,9 +2,9 @@
 
 internal static class MiddlewareExtensions
 {
-    internal static IApplicationBuilder UseLogContext(this IApplicationBuilder app)
+    internal static IApplicationBuilder UseLogContextTraceLogging(this IApplicationBuilder app)
     {
-        app.UseMiddleware<LogContextMiddleware>();
+        app.UseMiddleware<LogContextTraceLoggingMiddleware>();
 
         return app;
     }
