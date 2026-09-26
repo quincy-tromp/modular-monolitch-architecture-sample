@@ -11,19 +11,17 @@ namespace Evently.IntegrationTests.Abstractions;
 
 public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:latest")
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres:17")
         .WithDatabase("evently")
         .WithUsername("postgres")
         .WithPassword("postgres")
         .Build();
 
-    private readonly RedisContainer _redisContainer = new RedisBuilder()
-        .WithImage("redis:latest")
+    private readonly RedisContainer _redisContainer = new RedisBuilder("redis:latest")
         .Build();
 
-    private readonly KeycloakContainer _keycloakContainer = new KeycloakBuilder()
-        .WithImage("quay.io/keycloak/keycloak:latest")
+    private readonly KeycloakContainer _keycloakContainer =
+        new KeycloakBuilder("quay.io/keycloak/keycloak:26.5.1")
         .WithResourceMapping(
             new FileInfo("evently-realm-export.json"),
             new FileInfo("/opt/keycloak/data/import/realm.json"))

@@ -14,15 +14,13 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
 {
     public readonly IDateTimeProvider DateTimeProviderMock = Substitute.For<IDateTimeProvider>();
 
-    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:latest")
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres:17")
         .WithDatabase("evently")
         .WithUsername("postgres")
         .WithPassword("postgres")
         .Build();
 
-    private readonly RedisContainer _redisContainer = new RedisBuilder()
-        .WithImage("redis:latest")
+    private readonly RedisContainer _redisContainer = new RedisBuilder("redis:latest")
         .Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -32,7 +30,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
 
         builder.ConfigureTestServices(services =>
         {
-            services.RemoveAll(typeof(IDateTimeProvider));
+            services.RemoveAll<IDateTimeProvider>();
             
             DateTimeProviderMock.UtcNow.Returns(_ => DateTime.UtcNow);
             services.AddSingleton(DateTimeProviderMock);

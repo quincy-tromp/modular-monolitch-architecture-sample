@@ -1,10 +1,15 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
+# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+# This stage is used when running from VS in fast mode (Default for Debug configuration)
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# This stage is used to build the service project
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["API/Evently.Api/Evently.Api.csproj", "API/Evently.Api/"]
@@ -24,6 +29,10 @@ COPY ["Modules/Events/Evently.Modules.Events.Infrastructure/Evently.Modules.Even
 COPY ["Modules/Events/Evently.Modules.Events.Application/Evently.Modules.Events.Application.csproj", "Modules/Events/Evently.Modules.Events.Application/"]
 COPY ["Modules/Events/Evently.Modules.Events.Domain/Evently.Modules.Events.Domain.csproj", "Modules/Events/Evently.Modules.Events.Domain/"]
 COPY ["Modules/Events/Evently.Modules.Events.Presentation/Evently.Modules.Events.Presentation.csproj", "Modules/Events/Evently.Modules.Events.Presentation/"]
+COPY ["Modules/Ticketing/Evently.Modules.Ticketing.Infrastructure/Evently.Modules.Ticketing.Infrastructure.csproj", "Modules/Ticketing/Evently.Modules.Ticketing.Infrastructure/"]
+COPY ["Modules/Ticketing/Evently.Modules.Ticketing.Application/Evently.Modules.Ticketing.Application.csproj", "Modules/Ticketing/Evently.Modules.Ticketing.Application/"]
+COPY ["Modules/Ticketing/Evently.Modules.Ticketing.Domain/Evently.Modules.Ticketing.Domain.csproj", "Modules/Ticketing/Evently.Modules.Ticketing.Domain/"]
+COPY ["Modules/Ticketing/Evently.Modules.Ticketing.Presentation/Evently.Modules.Ticketing.Presentation.csproj", "Modules/Ticketing/Evently.Modules.Ticketing.Presentation/"]
 COPY ["Modules/Users/Evently.Modules.Users.Infrastructure/Evently.Modules.Users.Infrastructure.csproj", "Modules/Users/Evently.Modules.Users.Infrastructure/"]
 COPY ["Modules/Users/Evently.Modules.Users.Application/Evently.Modules.Users.Application.csproj", "Modules/Users/Evently.Modules.Users.Application/"]
 COPY ["Modules/Users/Evently.Modules.Users.Domain/Evently.Modules.Users.Domain.csproj", "Modules/Users/Evently.Modules.Users.Domain/"]
@@ -33,10 +42,12 @@ COPY . .
 WORKDIR "/src/API/Evently.Api"
 RUN dotnet build "./Evently.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+# This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Evently.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .

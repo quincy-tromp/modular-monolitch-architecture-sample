@@ -5,10 +5,10 @@ using Evently.Api.OpenTelemetry;
 using Evently.Common.Application;
 using Evently.Common.Infrastructure;
 using Evently.Common.Infrastructure.Configuration;
-using Evently.Common.Infrastructure.EventBus;
 using Evently.Common.Presentation.Endpoints;
 using Evently.Modules.Attendance.Infrastructure;
 using Evently.Modules.Events.Infrastructure;
+using Evently.Modules.Ticketing.Infrastructure;
 using Evently.Modules.Users.Infrastructure;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -27,22 +27,21 @@ builder.Services.AddSwaggerDocumentation();
 Assembly[] moduleApplicationAssemblies = [
     Evently.Modules.Users.Application.AssemblyReference.Assembly,
     Evently.Modules.Events.Application.AssemblyReference.Assembly,
+    Evently.Modules.Ticketing.Application.AssemblyReference.Assembly,
     Evently.Modules.Attendance.Application.AssemblyReference.Assembly];
 
 builder.Services.AddApplication(moduleApplicationAssemblies);
 
 string databaseConnectionString = builder.Configuration.GetConnectionStringOrThrow("Database");
 string redisConnectionString = builder.Configuration.GetConnectionStringOrThrow("Cache");
-var rabbitMqSettings = new RabbitMqSettings(builder.Configuration.GetConnectionStringOrThrow("Queue"));
 
 builder.Services.AddInfrastructure(
     DiagnosticsConfig.ServiceName,
     [
         EventsModule.ConfigureConsumers(redisConnectionString),
-        AttendanceModule.ConfigureConsumers,
-        UsersModule.ConfigureConsumers
+        TicketingModule.ConfigureConsumers,
+        AttendanceModule.ConfigureConsumers
     ],
-    rabbitMqSettings,
     databaseConnectionString,
     redisConnectionString);
 
@@ -51,14 +50,15 @@ Uri keyCloakHealthUrl = builder.Configuration.GetKeyCloakHealthUrl();
 builder.Services.AddHealthChecks()
     .AddNpgSql(databaseConnectionString)
     .AddRedis(redisConnectionString)
-    .AddRabbitMQ(rabbitConnectionString: rabbitMqSettings.Host)
     .AddKeyCloak(keyCloakHealthUrl);
 
-builder.Configuration.AddModuleConfiguration(["users", "events", "attendance"]);
+builder.Configuration.AddModuleConfiguration(["users", "events", "ticketing", "attendance"]);
 
 builder.Services.AddEventsModule(builder.Configuration);
 
 builder.Services.AddUsersModule(builder.Configuration);
+
+builder.Services.AddTicketingModule(builder.Configuration);
 
 builder.Services.AddAttendanceModule(builder.Configuration);
 
@@ -89,6 +89,6 @@ app.UseAuthorization();
 
 app.MapEndpoints();
 
-app.Run();
+await app.RunAsync();
 
 public partial class Program;
