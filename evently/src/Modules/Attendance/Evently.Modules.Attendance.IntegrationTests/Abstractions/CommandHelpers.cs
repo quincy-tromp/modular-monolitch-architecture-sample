@@ -1,9 +1,9 @@
-﻿using Bogus;
+using Bogus;
 using Evently.Common.Domain;
 using Evently.Modules.Attendance.Application.Attendees.CreateAttendee;
 using Evently.Modules.Attendance.Application.Events.CreateEvent;
 using Evently.Modules.Attendance.Application.Tickets.CreateTicket;
-using FluentAssertions;
+using AwesomeAssertions;
 using MediatR;
 
 namespace Evently.Modules.Attendance.IntegrationTests.Abstractions;
@@ -60,3 +60,4 @@ internal static class CommandHelpers
         return eventId; 
     }
 }
+

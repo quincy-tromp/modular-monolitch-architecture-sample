@@ -1,9 +1,9 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.IntegrationTests.Abstractions;
 using Evently.Modules.Ticketing.Application.Carts.AddItemToCart;
 using Evently.Modules.Ticketing.Application.Customers.GetCustomer;
 using Evently.Modules.Users.Application.Users.RegisterUser;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.IntegrationTests.AddToCart;
 
@@ -56,3 +56,4 @@ public sealed class AddItemToCartTests : BaseIntegrationTest
         result.IsSuccess.Should().BeTrue();
     }
 }
+

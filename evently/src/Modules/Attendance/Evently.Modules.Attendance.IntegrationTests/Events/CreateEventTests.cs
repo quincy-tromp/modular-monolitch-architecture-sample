@@ -1,8 +1,8 @@
-﻿using Bogus.DataSets;
+using Bogus.DataSets;
 using Evently.Common.Domain;
 using Evently.Modules.Attendance.Application.Events.CreateEvent;
 using Evently.Modules.Attendance.IntegrationTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Attendance.IntegrationTests.Events;
 
@@ -63,3 +63,4 @@ public class CreateEventTests : BaseIntegrationTest
         result.IsSuccess.Should().BeTrue();
     }
 }
+

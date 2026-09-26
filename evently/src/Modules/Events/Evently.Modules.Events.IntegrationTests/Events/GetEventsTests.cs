@@ -1,7 +1,7 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Events.Application.Events.GetEvents;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Events.IntegrationTests.Events;
 
@@ -47,3 +47,4 @@ public class GetEventsTests : BaseIntegrationTest
         result.Value.Should().HaveCount(2);
     }
 }
+

@@ -1,7 +1,7 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Ticketing.Domain.Events;
 using Evently.Modules.Ticketing.UnitTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Ticketing.UnitTests.Events;
 
@@ -93,3 +93,4 @@ public class TicketTypeTests : BaseTest
         domainEvent.TicketTypeId.Should().Be(ticketType.Value.Id);
     }
 }
+

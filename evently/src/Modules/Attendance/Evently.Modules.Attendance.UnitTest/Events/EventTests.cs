@@ -1,7 +1,7 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Attendance.Domain.Events;
 using Evently.Modules.Attendance.UnitTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Attendance.UnitTests.Events;
 
@@ -30,3 +30,4 @@ public class EventTests : BaseTest
         domainEvent.EventId.Should().Be(result.Value.Id);
     }
 }
+

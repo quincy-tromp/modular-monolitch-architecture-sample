@@ -1,9 +1,9 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Ticketing.Application.Carts;
 using Evently.Modules.Ticketing.Application.Orders.CreateOrder;
 using Evently.Modules.Ticketing.Domain.Customers;
 using Evently.Modules.Ticketing.IntegrationTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Ticketing.IntegrationTests.Orders;
 
@@ -42,3 +42,4 @@ public class CreateOrderTests : BaseIntegrationTest
         result.Error.Should().Be(CartErrors.Empty);
     }
 }
+

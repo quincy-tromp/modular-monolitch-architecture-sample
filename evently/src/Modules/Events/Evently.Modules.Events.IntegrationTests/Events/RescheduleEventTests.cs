@@ -1,9 +1,9 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Events.Application.Events.PublishEvent;
 using Evently.Modules.Events.Application.Events.RescheduleEvent;
 using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Events.IntegrationTests.Events;
 
@@ -64,3 +64,4 @@ public class RescheduleEventTests : BaseIntegrationTest
         result.IsSuccess.Should().BeTrue();
     }
 }
+

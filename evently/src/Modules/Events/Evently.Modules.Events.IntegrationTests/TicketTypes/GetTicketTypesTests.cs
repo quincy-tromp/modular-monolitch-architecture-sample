@@ -1,8 +1,8 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Events.Application.TicketTypes.GetTicketType;
 using Evently.Modules.Events.Application.TicketTypes.GetTicketTypes;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Events.IntegrationTests.TicketTypes;
 
@@ -49,3 +49,4 @@ public class GetTicketTypesTests : BaseIntegrationTest
         result.Value.Should().HaveCount(2);
     }
 }
+

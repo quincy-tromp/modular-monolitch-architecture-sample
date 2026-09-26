@@ -1,8 +1,8 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Events.Domain.Categories;
 using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.UnitTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Events.UnitTests.Events;
 
@@ -211,3 +211,4 @@ public class EventTests : BaseTest
         cancelResult.Error.Should().Be(EventErrors.AlreadyStarted);
     }
 }
+

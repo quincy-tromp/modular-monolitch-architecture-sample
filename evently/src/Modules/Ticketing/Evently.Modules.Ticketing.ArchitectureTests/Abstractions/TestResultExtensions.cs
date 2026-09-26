@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using AwesomeAssertions;
 using NetArchTest.Rules;
 
 namespace Evently.Modules.Ticketing.ArchitectureTests.Abstractions;
@@ -10,3 +10,4 @@ internal static class TestResultExtensions
         testResult.FailingTypes?.Should().BeEmpty();
     }
 }
+

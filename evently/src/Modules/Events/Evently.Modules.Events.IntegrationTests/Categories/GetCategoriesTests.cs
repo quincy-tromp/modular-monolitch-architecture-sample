@@ -1,8 +1,8 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Events.Application.Categories.GetCategories;
 using Evently.Modules.Events.Application.Categories.GetCategory;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Events.IntegrationTests.Categories;
 
@@ -48,3 +48,4 @@ public class GetCategoriesTests : BaseIntegrationTest
         result.Value.Should().HaveCount(2);
     }
 }
+

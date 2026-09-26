@@ -1,8 +1,8 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Events.Application.Events.CancelEvent;
 using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 using NSubstitute;
 
 namespace Evently.Modules.Events.IntegrationTests.Events;
@@ -84,3 +84,4 @@ public class CancelEventTests : BaseIntegrationTest
         result.IsSuccess.Should().BeTrue();
     }
 }
+

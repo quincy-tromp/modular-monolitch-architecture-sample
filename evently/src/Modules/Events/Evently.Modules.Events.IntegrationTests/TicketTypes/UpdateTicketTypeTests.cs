@@ -1,8 +1,8 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Events.Application.TicketTypes.UpdateTicketTypePrice;
 using Evently.Modules.Events.Domain.TicketTypes;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Events.IntegrationTests.TicketTypes;
 
@@ -43,3 +43,4 @@ public class UpdateTicketTypeTests : BaseIntegrationTest
         result.IsSuccess.Should().BeTrue();
     }
 }
+

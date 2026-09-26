@@ -1,7 +1,7 @@
-﻿using Bogus;
+using Bogus;
 using Evently.Common.Domain;
 using Evently.Modules.Ticketing.Application.Events.CreateEvent;
-using FluentAssertions;
+using AwesomeAssertions;
 using MediatR;
 
 namespace Evently.IntegrationTests.Abstractions;
@@ -36,3 +36,4 @@ internal static class CommandHelpers
         result.IsSuccess.Should().BeTrue();
     }
 }
+

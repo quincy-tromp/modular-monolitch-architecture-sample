@@ -1,9 +1,9 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.Modules.Users.Application.Users.RegisterUser;
 using Evently.Modules.Users.Application.Users.UpdateUser;
 using Evently.Modules.Users.Domain.Users;
 using Evently.Modules.Users.IntegrationTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace Evently.Modules.Users.IntegrationTests.Users;
 
@@ -67,3 +67,4 @@ public class UpdateUserTests : BaseIntegrationTest
         updateResult.IsSuccess.Should().BeTrue();
     }
 }
+

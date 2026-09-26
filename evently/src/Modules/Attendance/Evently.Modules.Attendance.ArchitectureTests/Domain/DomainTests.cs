@@ -1,7 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Evently.Common.Domain;
 using Evently.Modules.Attendance.ArchitectureTests.Abstractions;
-using FluentAssertions;
+using AwesomeAssertions;
 using NetArchTest.Rules;
 
 namespace Evently.Modules.Attendance.ArchitectureTests.Domain;
@@ -82,3 +82,4 @@ public class DomainTests : BaseTest
         failingTypes.Should().BeEmpty();
     }
 }
+
