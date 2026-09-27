@@ -1,4 +1,4 @@
-﻿using Evently.Common.Domain;
+using Evently.Common.Domain;
 using Evently.IntegrationTests.Abstractions;
 using Evently.Modules.Attendance.Application.Attendees.GetAttendee;
 using Evently.Modules.Ticketing.Application.Customers.GetCustomer;
@@ -24,7 +24,7 @@ public sealed class RegisterUserTests : BaseIntegrationTest
             Faker.Name.FirstName(),
             Faker.Name.LastName());
 
-        Result<Guid> userResult = await Sender.Send(command);
+        Result<Guid> userResult = await SendCommand<RegisterUserCommand, Guid>(command);
 
         userResult.IsSuccess.Should().BeTrue();
 
@@ -35,7 +35,7 @@ public sealed class RegisterUserTests : BaseIntegrationTest
             {
                 var query = new GetCustomerQuery(userResult.Value);
 
-                Result<CustomerResponse> customerResult = await Sender.Send(query);
+                Result<CustomerResponse> customerResult = await SendQuery<GetCustomerQuery, CustomerResponse>(query);
 
                 return customerResult;
             });
@@ -55,7 +55,7 @@ public sealed class RegisterUserTests : BaseIntegrationTest
             Faker.Name.FirstName(),
             Faker.Name.LastName());
 
-        Result<Guid> userResult = await Sender.Send(command);
+        Result<Guid> userResult = await SendCommand<RegisterUserCommand, Guid>(command);
 
         userResult.IsSuccess.Should().BeTrue();
 
@@ -66,7 +66,7 @@ public sealed class RegisterUserTests : BaseIntegrationTest
             {
                 var query = new GetAttendeeQuery(userResult.Value);
 
-                Result<AttendeeResponse> customerResult = await Sender.Send(query);
+                Result<AttendeeResponse> customerResult = await SendQuery<GetAttendeeQuery, AttendeeResponse>(query);
 
                 return customerResult;
             });
@@ -76,3 +76,4 @@ public sealed class RegisterUserTests : BaseIntegrationTest
         attendeeResult.Value.Should().NotBeNull();
     }
 }
+

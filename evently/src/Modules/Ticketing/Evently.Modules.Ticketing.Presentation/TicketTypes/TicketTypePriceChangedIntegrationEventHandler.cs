@@ -1,20 +1,20 @@
 ﻿using Evently.Common.Application.EventBus;
 using Evently.Common.Application.Exceptions;
+using Evently.Common.Application.Messaging;
 using Evently.Common.Domain;
 using Evently.Modules.Events.IntegrationEvents;
 using Evently.Modules.Ticketing.Application.TicketTypes.UpdateTicketTypePrice;
-using MediatR;
 
 namespace Evently.Modules.Ticketing.Presentation.TicketTypes;
 
-internal sealed class TicketTypePriceChangedIntegrationEventHandler(ISender sender)
+internal sealed class TicketTypePriceChangedIntegrationEventHandler(ICommandHandler<UpdateTicketTypePriceCommand> handler)
     : IntegrationEventHandler<TicketTypePriceChangedIntegrationEvent>
 {
     public override async Task Handle(
         TicketTypePriceChangedIntegrationEvent integrationEvent,
         CancellationToken cancellationToken = default)
     {
-        Result result = await sender.Send(
+        Result result = await handler.Handle(
             new UpdateTicketTypePriceCommand(integrationEvent.TicketTypeId, integrationEvent.Price),
             cancellationToken);
 

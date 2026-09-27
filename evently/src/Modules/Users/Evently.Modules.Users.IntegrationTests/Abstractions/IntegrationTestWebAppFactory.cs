@@ -22,11 +22,11 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
 
     private readonly KeycloakContainer _keycloakContainer =
         new KeycloakBuilder("quay.io/keycloak/keycloak:26.5.1")
-            .WithResourceMapping(
-                new FileInfo("evently-realm-export.json"),
-                new FileInfo("/opt/keycloak/data/import/realm.json"))
-            .WithCommand("--import-realm")
-            .Build();
+        .WithResourceMapping(
+            new FileInfo("evently-realm-export.json"),
+            new FileInfo("/opt/keycloak/data/import/realm.json"))
+        .WithCommand("--import-realm")
+        .Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

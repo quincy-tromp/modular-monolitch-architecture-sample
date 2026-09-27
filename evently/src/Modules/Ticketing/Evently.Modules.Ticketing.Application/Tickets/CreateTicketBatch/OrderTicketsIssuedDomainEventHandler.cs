@@ -4,18 +4,17 @@ using Evently.Common.Domain;
 using Evently.Modules.Ticketing.Application.Tickets.GetTicket;
 using Evently.Modules.Ticketing.Application.Tickets.GetTicketForOrder;
 using Evently.Modules.Ticketing.Domain.Orders;
-using MediatR;
 
 namespace Evently.Modules.Ticketing.Application.Tickets.CreateTicketBatch;
 
-internal sealed class OrderTicketsIssuedDomainEventHandler(ISender sender)
+internal sealed class OrderTicketsIssuedDomainEventHandler(IQueryHandler<GetTicketsForOrderQuery, IReadOnlyCollection<TicketResponse>> handler)
     : DomainEventHandler<OrderTicketsIssuedDomainEvent>
 {
     public override async Task Handle(
         OrderTicketsIssuedDomainEvent domainEvent,
         CancellationToken cancellationToken = default)
     {
-        Result<IReadOnlyCollection<TicketResponse>> result = await sender.Send(
+        Result<IReadOnlyCollection<TicketResponse>> result = await handler.Handle(
             new GetTicketsForOrderQuery(domainEvent.OrderId), cancellationToken);
 
         if (result.IsFailure)

@@ -1,9 +1,10 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Bogus;
+using Evently.Common.Application.Messaging;
+using Evently.Common.Domain;
 using Evently.Modules.Users.Infrastructure.Database;
 using Evently.Modules.Users.Infrastructure.Identity;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -15,7 +16,6 @@ public abstract class BaseIntegrationTest : IDisposable
 {
     protected static readonly Faker Faker = new();
     private readonly IServiceScope _scope;
-    protected readonly ISender Sender;
     protected readonly UsersDbContext DbContext;
     protected readonly HttpClient HttpClient;
     private readonly KeyCloakOptions _options;
@@ -24,9 +24,35 @@ public abstract class BaseIntegrationTest : IDisposable
     {
         _scope = factory.Services.CreateScope();
         HttpClient = factory.CreateClient();
-        Sender = _scope.ServiceProvider.GetRequiredService<ISender>();
         DbContext = _scope.ServiceProvider.GetRequiredService<UsersDbContext>();
         _options = factory.Services.GetRequiredService<IOptions<KeyCloakOptions>>().Value;
+    }
+
+    protected async Task<Result<TResult>> SendCommand<TCommand, TResult>(TCommand command)
+        where TCommand : ICommand<TResult>
+    {
+        ICommandHandler<TCommand, TResult> handler = _scope.ServiceProvider
+            .GetRequiredService<ICommandHandler<TCommand, TResult>>();
+
+        return await handler.Handle(command, CancellationToken.None);
+    }
+
+    protected async Task<Result> SendCommand<TCommand>(TCommand command)
+        where TCommand : ICommand
+    {
+        ICommandHandler<TCommand> handler = _scope.ServiceProvider
+            .GetRequiredService<ICommandHandler<TCommand>>();
+
+        return await handler.Handle(command, CancellationToken.None);
+    }
+
+    protected async Task<Result<TResult>> SendQuery<TQuery, TResult>(TQuery query)
+        where TQuery : IQuery<TResult>
+    {
+        IQueryHandler<TQuery, TResult> handler = _scope.ServiceProvider
+            .GetRequiredService<IQueryHandler<TQuery, TResult>>();
+
+        return await handler.Handle(query, CancellationToken.None);
     }
 
     protected async Task CleanDatabaseAsync()
