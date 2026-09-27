@@ -22,12 +22,13 @@ using Evently.Modules.Ticketing.Infrastructure.Outbox;
 using Evently.Modules.Ticketing.Infrastructure.Payments;
 using Evently.Modules.Ticketing.Infrastructure.Tickets;
 using Evently.Modules.Users.IntegrationEvents;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Wolverine;
+using Wolverine.RabbitMQ;
 
 namespace Evently.Modules.Ticketing.Infrastructure;
 
@@ -46,13 +47,13 @@ public static class TicketingModule
         return services;
     }
 
-    public static void ConfigureConsumers(IRegistrationConfigurator registrationConfigurator)
+    public static void ConfigureWolverine(WolverineOptions options)
     {
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<UserRegisteredIntegrationEvent>>();
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<UserProfileUpdatedIntegrationEvent>>();
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<EventPublishedIntegrationEvent>>();
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<TicketTypePriceChangedIntegrationEvent>>();
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<EventCancellationStartedIntegrationEvent>>();
+        options.Discovery.IncludeType<UserRegisteredIntegrationEventConsumer>();
+        options.Discovery.IncludeType<UserProfileUpdatedIntegrationEventConsumer>();
+        options.Discovery.IncludeType<EventPublishedIntegrationEventConsumer>();
+        options.Discovery.IncludeType<TicketTypePriceChangedIntegrationEventConsumer>();
+        options.Discovery.IncludeType<EventCancellationStartedIntegrationEventConsumer>();
     }
 
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)

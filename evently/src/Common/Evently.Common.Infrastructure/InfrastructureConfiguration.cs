@@ -8,14 +8,15 @@ using Evently.Common.Infrastructure.Authorization;
 using Evently.Common.Infrastructure.Caching;
 using Evently.Common.Infrastructure.Clock;
 using Evently.Common.Infrastructure.Data;
+using Evently.Common.Infrastructure.EventBus;
 using Evently.Common.Infrastructure.Outbox;
-using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Quartz;
+using RabbitMQ.Client;
 using StackExchange.Redis;
 
 namespace Evently.Common.Infrastructure;
@@ -25,7 +26,7 @@ public static class InfrastructureConfiguration
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         string serviceName,
-        Action<IRegistrationConfigurator>[] moduleConfigureConsumers,
+        RabbitMqSettings rabbitMqSettings,
         string databaseConnectionString,
         string redisConnectionString)
     {
@@ -35,7 +36,7 @@ public static class InfrastructureConfiguration
 
         services.TryAddSingleton<IDateTimeProvider, DateTimeProvider>();
 
-        services.TryAddSingleton<IEventBus, EventBus.EventBus>();
+        services.TryAddScoped<IEventBus, EventBus.EventBus>();
 
         services.TryAddSingleton<InsertOutboxMessagesInterceptor>();
 
@@ -69,19 +70,13 @@ public static class InfrastructureConfiguration
 
         services.TryAddSingleton<ICacheService, CacheService>();
 
-        services.AddMassTransit(configure =>
+        services.AddSingleton<IConnection>(sp =>
         {
-            foreach (Action<IRegistrationConfigurator> configureConsumers in moduleConfigureConsumers)
+            var factory = new ConnectionFactory
             {
-                configureConsumers(configure);
-            }
-
-            configure.SetKebabCaseEndpointNameFormatter();
-
-            configure.UsingInMemory((context, cfg) =>
-            {
-                cfg.ConfigureEndpoints(context);
-            });
+                Uri = new Uri(rabbitMqSettings.Host),
+            };
+            return factory.CreateConnectionAsync().GetAwaiter().GetResult();
         });
 
         services
@@ -95,7 +90,7 @@ public static class InfrastructureConfiguration
                     .AddEntityFrameworkCoreInstrumentation()
                     .AddRedisInstrumentation()
                     .AddNpgsql()
-                    .AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
+                    .AddSource("Wolverine");
 
                 tracing.AddOtlpExporter();
             });

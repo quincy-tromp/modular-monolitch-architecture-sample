@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.Keycloak;
 using Testcontainers.PostgreSql;
+using Testcontainers.RabbitMq;
 using Testcontainers.Redis;
 
 namespace Evently.Modules.Users.IntegrationTests.Abstractions;
@@ -28,10 +29,14 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         .WithCommand("--import-realm")
         .Build();
 
+    private readonly RabbitMqContainer _rabbitMqContainer =
+        new RabbitMqBuilder("rabbitmq:4.2.4-management-alpine").Build();
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         Environment.SetEnvironmentVariable("ConnectionStrings:Database", _dbContainer.GetConnectionString());
         Environment.SetEnvironmentVariable("ConnectionStrings:Cache", _redisContainer.GetConnectionString());
+        Environment.SetEnvironmentVariable("ConnectionStrings:Queue", _rabbitMqContainer.GetConnectionString());
 
         string keycloakAddress = _keycloakContainer.GetBaseAddress();
         string keyCloakRealmUrl = $"{keycloakAddress}realms/evently";
@@ -58,6 +63,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         await _dbContainer.StartAsync();
         await _redisContainer.StartAsync();
         await _keycloakContainer.StartAsync();
+        await _rabbitMqContainer.StartAsync();
     }
 
     public new async Task DisposeAsync()
@@ -65,5 +71,6 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         await _dbContainer.StopAsync();
         await _redisContainer.StopAsync();
         await _keycloakContainer.StopAsync();
+        await _rabbitMqContainer.StartAsync();
     }
 }

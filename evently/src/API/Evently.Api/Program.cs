@@ -5,14 +5,19 @@ using Evently.Api.OpenTelemetry;
 using Evently.Common.Application;
 using Evently.Common.Infrastructure;
 using Evently.Common.Infrastructure.Configuration;
+using Evently.Common.Infrastructure.EventBus;
 using Evently.Common.Presentation.Endpoints;
 using Evently.Modules.Attendance.Infrastructure;
 using Evently.Modules.Events.Infrastructure;
 using Evently.Modules.Ticketing.Infrastructure;
 using Evently.Modules.Users.Infrastructure;
 using HealthChecks.UI.Client;
+using JasperFx.Resources;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
+using Wolverine;
+using Wolverine.Postgresql;
+using Wolverine.RabbitMQ;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -34,22 +39,42 @@ builder.Services.AddApplication(moduleApplicationAssemblies);
 
 string databaseConnectionString = builder.Configuration.GetConnectionStringOrThrow("Database");
 string redisConnectionString = builder.Configuration.GetConnectionStringOrThrow("Cache");
+var rabbitMqSettings = new RabbitMqSettings(builder.Configuration.GetConnectionString("Queue")!);
 
 builder.Services.AddInfrastructure(
     DiagnosticsConfig.ServiceName,
-    [
-        EventsModule.ConfigureConsumers(redisConnectionString),
-        TicketingModule.ConfigureConsumers,
-        AttendanceModule.ConfigureConsumers
-    ],
+    rabbitMqSettings,
     databaseConnectionString,
     redisConnectionString);
+
+builder.Host.UseWolverine(options =>
+{
+    options.PersistMessagesWithPostgresql(databaseConnectionString);
+
+    options.UseRabbitMq(rabbitMqSettings.Host)
+        .AutoProvision()
+        .UseConventionalRouting();
+
+    options.Services.AddResourceSetupOnStartup();
+
+    options.Policies.DisableConventionalLocalRouting();
+
+    options.MultipleHandlerBehavior = MultipleHandlerBehavior.Separated;
+    options.Durability.MessageIdentity = MessageIdentity.IdAndDestination;
+
+    options.Durability.Mode = DurabilityMode.Solo;
+
+    EventsModule.ConfigureWolverine(options);
+    TicketingModule.ConfigureWolverine(options);
+    AttendanceModule.ConfigureWolverine(options);
+});
 
 Uri keyCloakHealthUrl = builder.Configuration.GetKeyCloakHealthUrl();
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(databaseConnectionString)
     .AddRedis(redisConnectionString)
+    .AddRabbitMQ()
     .AddKeyCloak(keyCloakHealthUrl);
 
 builder.Configuration.AddModuleConfiguration(["users", "events", "ticketing", "attendance"]);

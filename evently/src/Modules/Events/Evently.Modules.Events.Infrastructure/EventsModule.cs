@@ -11,14 +11,15 @@ using Evently.Modules.Events.Infrastructure.Database;
 using Evently.Modules.Events.Infrastructure.Events;
 using Evently.Modules.Events.Infrastructure.Inbox;
 using Evently.Modules.Events.Infrastructure.Outbox;
+using Evently.Modules.Events.Infrastructure.Sagas;
 using Evently.Modules.Events.Infrastructure.TicketTypes;
-using Evently.Modules.Events.Presentation.Events.CancelEventSaga;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Wolverine;
+using Wolverine.RDBMS;
 
 namespace Evently.Modules.Events.Infrastructure;
 
@@ -39,11 +40,11 @@ public static class EventsModule
         return services;
     }
 
-    public static Action<IRegistrationConfigurator> ConfigureConsumers(string redisConnectionString)
+    public static void ConfigureWolverine(WolverineOptions options)
     {
-        return registration => registration
-            .AddSagaStateMachine<CancelEventSaga, CancelEventState>()
-            .RedisRepository(redisConnectionString);
+        options.AddSagaType<CancelEventSaga>();
+
+        options.Discovery.IncludeType<CancelEventSaga>();
     }
 
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)

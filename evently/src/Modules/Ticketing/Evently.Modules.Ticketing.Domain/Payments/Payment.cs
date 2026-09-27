@@ -58,7 +58,7 @@ public sealed class Payment : Entity
 
         if (Amount == AmountRefunded)
         {
-            Raise(new PaymentRefundedDomainEvent(Id, TransactionId, refundAmount));
+            Raise(new PaymentRefundedDomainEvent(Id, OrderId, TransactionId, refundAmount));
         }
         else
         {

@@ -14,15 +14,12 @@ using Evently.Modules.Attendance.Infrastructure.Events;
 using Evently.Modules.Attendance.Infrastructure.Inbox;
 using Evently.Modules.Attendance.Infrastructure.Outbox;
 using Evently.Modules.Attendance.Infrastructure.Tickets;
-using Evently.Modules.Events.IntegrationEvents;
-using Evently.Modules.Ticketing.IntegrationEvents;
-using Evently.Modules.Users.IntegrationEvents;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Wolverine;
 
 namespace Evently.Modules.Attendance.Infrastructure;
 
@@ -43,13 +40,13 @@ public static class AttendanceModule
         return services;
     }
 
-    public static void ConfigureConsumers(IRegistrationConfigurator registrationConfigurator)
+    public static void ConfigureWolverine(WolverineOptions options)
     {
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<UserRegisteredIntegrationEvent>>();
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<UserProfileUpdatedIntegrationEvent>>();
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<EventPublishedIntegrationEvent>>();
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<TicketIssuedIntegrationEvent>>();
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<EventCancellationStartedIntegrationEvent>>();
+        options.Discovery.IncludeType<UserRegisteredIntegrationEventConsumer>();
+        options.Discovery.IncludeType<UserProfileUpdatedIntegrationEventConsumer>();
+        options.Discovery.IncludeType<EventPublishedIntegrationEventConsumer>();
+        options.Discovery.IncludeType<TicketIssuedIntegrationEventConsumer>();
+        options.Discovery.IncludeType<EventCancellationStartedIntegrationEventConsumer>();
     }
 
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
