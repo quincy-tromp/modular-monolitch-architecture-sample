@@ -1,8 +1,8 @@
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Modules.Events.Application.Categories.UpdateCategory;
 using Evently.Modules.Events.Domain.Categories;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Events.IntegrationTests.Categories;
 
@@ -24,7 +24,7 @@ public class UpdateCategoryTests : BaseIntegrationTest
     public async Task Should_ReturnFailure_WhenCommandIsNotValid(UpdateCategoryCommand command)
     {
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -38,7 +38,7 @@ public class UpdateCategoryTests : BaseIntegrationTest
         var command = new UpdateCategoryCommand(Guid.NewGuid(), Faker.Music.Genre());
 
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.Error.Should().Be(CategoryErrors.NotFound(command.CategoryId));
@@ -48,15 +48,14 @@ public class UpdateCategoryTests : BaseIntegrationTest
     public async Task Should_UpdateCategory_WhenCategoryExists()
     {
         // Arrange
-        Guid categoryId = await this.CreateCategoryAsync(Faker.Music.Genre());
+        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
 
         var command = new UpdateCategoryCommand(categoryId, Faker.Music.Genre());
 
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
     }
 }
-

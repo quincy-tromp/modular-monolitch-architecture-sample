@@ -1,6 +1,7 @@
 ﻿using Evently.Common.Infrastructure.Inbox;
 using Evently.Common.Infrastructure.Outbox;
 using Evently.Modules.Attendance.Application.Abstractions.Data;
+using Evently.Modules.Attendance.Application.EventStatistics;
 using Evently.Modules.Attendance.Domain.Attendees;
 using Evently.Modules.Attendance.Domain.Events;
 using Evently.Modules.Attendance.Domain.Tickets;
@@ -20,8 +21,6 @@ public sealed class AttendanceDbContext(DbContextOptions<AttendanceDbContext> op
 
     internal DbSet<Ticket> Tickets { get; set; }
 
-    internal DbSet<EventStatistics> EventStatistics { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema(Schemas.Attendance);
@@ -33,6 +32,5 @@ public sealed class AttendanceDbContext(DbContextOptions<AttendanceDbContext> op
         modelBuilder.ApplyConfiguration(new AttendeeConfiguration());
         modelBuilder.ApplyConfiguration(new EventConfiguration());
         modelBuilder.ApplyConfiguration(new TicketConfiguration());
-        modelBuilder.ApplyConfiguration(new EventStatisticsConfiguration());
     }
 }

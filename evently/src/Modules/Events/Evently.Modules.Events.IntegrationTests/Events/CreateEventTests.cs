@@ -1,9 +1,9 @@
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Modules.Events.Application.Events.CreateEvent;
 using Evently.Modules.Events.Domain.Categories;
 using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Events.IntegrationTests.Events;
 
@@ -27,7 +27,7 @@ public class CreateEventTests : BaseIntegrationTest
             null);
 
         // Act
-        Result<Guid> result = await SendCommand<CreateEventCommand, Guid>(command);
+        Result<Guid> result = await Sender.Send(command);
 
         // Assert
         result.Error.Should().Be(EventErrors.StartDateInPast);
@@ -48,7 +48,7 @@ public class CreateEventTests : BaseIntegrationTest
             null);
 
         // Act
-        Result<Guid> result = await SendCommand<CreateEventCommand, Guid>(command);
+        Result<Guid> result = await Sender.Send(command);
 
         // Assert
         result.Error.Should().Be(CategoryErrors.NotFound(categoryId));
@@ -72,7 +72,7 @@ public class CreateEventTests : BaseIntegrationTest
             endsAtUtc);
 
         // Act
-        Result<Guid> result = await SendCommand<CreateEventCommand, Guid>(command);
+        Result<Guid> result = await Sender.Send(command);
 
         // Assert
         result.Error.Type.Should().Be(ErrorType.Validation);
@@ -83,7 +83,7 @@ public class CreateEventTests : BaseIntegrationTest
     {
         // Arrange
         await CleanDatabaseAsync();
-        Guid categoryId = await this.CreateCategoryAsync(Faker.Music.Genre());
+        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
 
         var command = new CreateEventCommand(
             categoryId,
@@ -94,11 +94,10 @@ public class CreateEventTests : BaseIntegrationTest
             null);
 
         // Act
-        Result<Guid> result = await SendCommand<CreateEventCommand, Guid>(command);
+        Result<Guid> result = await Sender.Send(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeEmpty();
     }
 }
-

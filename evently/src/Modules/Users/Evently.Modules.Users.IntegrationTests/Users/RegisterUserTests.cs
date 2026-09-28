@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Evently.Modules.Users.IntegrationTests.Abstractions;
 using Evently.Modules.Users.Presentation.Users;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Users.IntegrationTests.Users;
 
@@ -87,4 +87,3 @@ public class RegisterUserTests : BaseIntegrationTest
         accessToken.Should().NotBeEmpty();
     }
 }
-

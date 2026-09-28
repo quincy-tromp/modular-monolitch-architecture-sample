@@ -1,9 +1,9 @@
-using AwesomeAssertions;
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.IntegrationTests.Abstractions;
 using Evently.Modules.Ticketing.Application.Carts.AddItemToCart;
 using Evently.Modules.Ticketing.Application.Customers.GetCustomer;
 using Evently.Modules.Users.Application.Users.RegisterUser;
+using FluentAssertions;
 
 namespace Evently.IntegrationTests.AddToCart;
 
@@ -26,7 +26,7 @@ public sealed class AddItemToCartTests : BaseIntegrationTest
             Faker.Name.FirstName(),
             Faker.Name.LastName());
 
-        Result<Guid> userResult = await SendCommand<RegisterUserCommand, Guid>(command);
+        Result<Guid> userResult = await Sender.Send(command);
 
         userResult.IsSuccess.Should().BeTrue();
 
@@ -37,8 +37,7 @@ public sealed class AddItemToCartTests : BaseIntegrationTest
             {
                 var query = new GetCustomerQuery(userResult.Value);
 
-                Result<CustomerResponse> customerResult =
-                    await SendQuery<GetCustomerQuery, CustomerResponse>(query);
+                Result<CustomerResponse> customerResult = await Sender.Send(query);
 
                 return customerResult;
             });
@@ -49,12 +48,11 @@ public sealed class AddItemToCartTests : BaseIntegrationTest
         CustomerResponse customer = customerResult.Value;
         var ticketTypeId = Guid.NewGuid();
 
-        await this.CreateEventAsync(Guid.NewGuid(), ticketTypeId, Quantity);
+        await Sender.CreateEventAsync(Guid.NewGuid(), ticketTypeId, Quantity);
 
-        Result result = await SendCommand(new AddItemToCartCommand(customer.Id, ticketTypeId, Quantity));
+        Result result = await Sender.Send(new AddItemToCartCommand(customer.Id, ticketTypeId, Quantity));
 
         // Assert
         result.IsSuccess.Should().BeTrue();
     }
 }
-

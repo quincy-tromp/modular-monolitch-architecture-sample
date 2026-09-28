@@ -1,7 +1,7 @@
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Modules.Ticketing.Application.Events.CreateEvent;
 using Evently.Modules.Ticketing.IntegrationTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Ticketing.IntegrationTests.Events;
 
@@ -38,10 +38,9 @@ public class CreateEventTests : BaseIntegrationTest
             [ticketType]);
 
         //Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         //Assert
         result.IsSuccess.Should().BeTrue();
     }
 }
-

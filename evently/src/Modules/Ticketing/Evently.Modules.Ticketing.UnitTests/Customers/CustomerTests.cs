@@ -1,7 +1,7 @@
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Modules.Ticketing.Domain.Customers;
 using Evently.Modules.Ticketing.UnitTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Ticketing.UnitTests.Customers;
 
@@ -20,4 +20,3 @@ public class CustomerTests : BaseTest
         result.Value.Should().NotBeNull();
     }
 }
-

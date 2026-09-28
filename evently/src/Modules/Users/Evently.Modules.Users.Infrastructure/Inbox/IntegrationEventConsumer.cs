@@ -4,16 +4,20 @@ using Evently.Common.Application.Data;
 using Evently.Common.Application.EventBus;
 using Evently.Common.Infrastructure.Inbox;
 using Evently.Common.Infrastructure.Serialization;
+using MassTransit;
 using Newtonsoft.Json;
 
 namespace Evently.Modules.Users.Infrastructure.Inbox;
 
-public sealed class IntegrationEventConsumer<TIntegrationEvent>(IDbConnectionFactory dbConnectionFactory)
+internal sealed class IntegrationEventConsumer<TIntegrationEvent>(IDbConnectionFactory dbConnectionFactory)
+    : IConsumer<TIntegrationEvent>
     where TIntegrationEvent : IntegrationEvent
 {
-    public async Task Handle(TIntegrationEvent integrationEvent)
+    public async Task Consume(ConsumeContext<TIntegrationEvent> context)
     {
         await using DbConnection connection = await dbConnectionFactory.OpenConnectionAsync();
+
+        TIntegrationEvent integrationEvent = context.Message;
 
         var inboxMessage = new InboxMessage
         {
@@ -27,7 +31,6 @@ public sealed class IntegrationEventConsumer<TIntegrationEvent>(IDbConnectionFac
             """
             INSERT INTO users.inbox_messages(id, type, content, occurred_on_utc)
             VALUES (@Id, @Type, @Content::json, @OccurredOnUtc)
-            ON CONFLICT DO NOTHING
             """;
 
         await connection.ExecuteAsync(sql, inboxMessage);

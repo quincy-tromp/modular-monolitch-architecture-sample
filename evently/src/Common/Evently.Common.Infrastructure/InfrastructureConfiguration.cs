@@ -8,15 +8,19 @@ using Evently.Common.Infrastructure.Authorization;
 using Evently.Common.Infrastructure.Caching;
 using Evently.Common.Infrastructure.Clock;
 using Evently.Common.Infrastructure.Data;
-using Evently.Common.Infrastructure.EventBus;
 using Evently.Common.Infrastructure.Outbox;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using Npgsql;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Quartz;
-using RabbitMQ.Client;
 using StackExchange.Redis;
 
 namespace Evently.Common.Infrastructure;
@@ -26,9 +30,10 @@ public static class InfrastructureConfiguration
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         string serviceName,
-        RabbitMqSettings rabbitMqSettings,
+        Action<IRegistrationConfigurator>[] moduleConfigureConsumers,
         string databaseConnectionString,
-        string redisConnectionString)
+        string redisConnectionString,
+        string mongoConnectionString)
     {
         services.AddAuthenticationInternal();
 
@@ -36,7 +41,7 @@ public static class InfrastructureConfiguration
 
         services.TryAddSingleton<IDateTimeProvider, DateTimeProvider>();
 
-        services.TryAddScoped<IEventBus, EventBus.EventBus>();
+        services.TryAddSingleton<IEventBus, EventBus.EventBus>();
 
         services.TryAddSingleton<InsertOutboxMessagesInterceptor>();
 
@@ -70,13 +75,19 @@ public static class InfrastructureConfiguration
 
         services.TryAddSingleton<ICacheService, CacheService>();
 
-        services.AddSingleton<IConnection>(sp =>
+        services.AddMassTransit(configure =>
         {
-            var factory = new ConnectionFactory
+            foreach (Action<IRegistrationConfigurator> configureConsumers in moduleConfigureConsumers)
             {
-                Uri = new Uri(rabbitMqSettings.Host),
-            };
-            return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+                configureConsumers(configure);
+            }
+
+            configure.SetKebabCaseEndpointNameFormatter();
+
+            configure.UsingInMemory((context, cfg) =>
+            {
+                cfg.ConfigureEndpoints(context);
+            });
         });
 
         services
@@ -90,10 +101,28 @@ public static class InfrastructureConfiguration
                     .AddEntityFrameworkCoreInstrumentation()
                     .AddRedisInstrumentation()
                     .AddNpgsql()
-                    .AddSource("Wolverine");
+                    .AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName)
+                    .AddSource("MongoDB.Driver.Core.Extensions.DiagnosticSources");
 
                 tracing.AddOtlpExporter();
             });
+
+        var mongoClientSettings = MongoClientSettings.FromConnectionString(mongoConnectionString);
+
+        mongoClientSettings.ClusterConfigurator = c => c.Subscribe(
+            new DiagnosticsActivityEventSubscriber(
+                new InstrumentationOptions
+                {
+                    CaptureCommandText = true
+                }));
+
+        services.AddSingleton<IMongoClient>(new MongoClient(mongoClientSettings));
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;
+        BsonDefaults.GuidRepresentationMode = GuidRepresentationMode.V3;
+#pragma warning restore CS0618 // Type or member is obsolete
+        BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 
         return services;
     }

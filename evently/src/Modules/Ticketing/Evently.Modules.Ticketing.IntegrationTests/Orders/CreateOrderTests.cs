@@ -1,9 +1,9 @@
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Modules.Ticketing.Application.Carts;
 using Evently.Modules.Ticketing.Application.Orders.CreateOrder;
 using Evently.Modules.Ticketing.Domain.Customers;
 using Evently.Modules.Ticketing.IntegrationTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Ticketing.IntegrationTests.Orders;
 
@@ -21,7 +21,7 @@ public class CreateOrderTests : BaseIntegrationTest
         var command = new CreateOrderCommand(Guid.NewGuid());
 
         //Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         //Assert
         result.Error.Should().Be(CustomerErrors.NotFound(command.CustomerId));
@@ -31,15 +31,14 @@ public class CreateOrderTests : BaseIntegrationTest
     public async Task Should_ReturnFailure_WhenCartIsEmpty()
     {
         //Arrange
-        Guid customerId = await this.CreateCustomerAsync(Guid.NewGuid());
+        Guid customerId = await Sender.CreateCustomerAsync(Guid.NewGuid());
 
         var command = new CreateOrderCommand(customerId);
 
         //Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         //Assert
         result.Error.Should().Be(CartErrors.Empty);
     }
 }
-

@@ -1,7 +1,8 @@
-using AwesomeAssertions;
+﻿using Bogus.DataSets;
 using Evently.Common.Domain;
 using Evently.Modules.Attendance.Application.Events.CreateEvent;
 using Evently.Modules.Attendance.IntegrationTests.Abstractions;
+using FluentAssertions;
 
 namespace Evently.Modules.Attendance.IntegrationTests.Events;
 
@@ -35,7 +36,7 @@ public class CreateEventTests : BaseIntegrationTest
         var command = new CreateEventCommand(eventId, title, description, location, startsAtUtc, endsAtUtc);
 
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -56,10 +57,9 @@ public class CreateEventTests : BaseIntegrationTest
             null);
 
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
     }
 }
-

@@ -5,19 +5,18 @@ using Evently.Common.Domain;
 using Evently.Modules.Users.Application.Users.GetUser;
 using Evently.Modules.Users.Domain.Users;
 using Evently.Modules.Users.IntegrationEvents;
+using MediatR;
 
 namespace Evently.Modules.Users.Application.Users.RegisterUser;
 
-internal sealed class UserRegisteredDomainEventHandler(
-    IQueryHandler<GetUserQuery, UserResponse> handler,
-    IEventBus bus)
+internal sealed class UserRegisteredDomainEventHandler(ISender sender, IEventBus bus)
     : DomainEventHandler<UserRegisteredDomainEvent>
 {
     public override async Task Handle(
         UserRegisteredDomainEvent domainEvent,
         CancellationToken cancellationToken = default)
     {
-        Result<UserResponse> result = await handler.Handle(
+        Result<UserResponse> result = await sender.Send(
             new GetUserQuery(domainEvent.UserId),
             cancellationToken);
 

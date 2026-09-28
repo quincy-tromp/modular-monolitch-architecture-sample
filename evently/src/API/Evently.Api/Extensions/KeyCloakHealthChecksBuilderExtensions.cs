@@ -4,7 +4,7 @@ namespace Evently.Api.Extensions;
 
 internal static class KeyCloakHealthChecksBuilderExtensions
 {
-    private const string KeyCloakHealthCheck = "keycloak";
+    private const string KeyCloakHealthCheck = "KeyCloak";
     private const string KeyCloakHealthUrl = "KeyCloak:HealthUrl";
 
     internal static IHealthChecksBuilder AddKeyCloak(this IHealthChecksBuilder builder, Uri healthUri)

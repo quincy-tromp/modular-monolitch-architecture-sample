@@ -1,9 +1,9 @@
-﻿using Evently.Common.Application.Messaging;
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Common.Presentation.Endpoints;
 using Evently.Common.Presentation.Results;
 using Evently.Modules.Ticketing.Application.Tickets.GetTicket;
 using Evently.Modules.Ticketing.Application.Tickets.GetTicketForOrder;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -14,13 +14,10 @@ internal sealed class GetTicketsForOrder : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("tickets/order/{orderId}", async (
-            Guid orderId,
-            IQueryHandler<GetTicketsForOrderQuery, IReadOnlyCollection<TicketResponse>> handler,
-            CancellationToken cancellationToken) =>
+        app.MapGet("tickets/order/{orderId}", async (Guid orderId, ISender sender) =>
         {
-            Result<IReadOnlyCollection<TicketResponse>> result = await handler.Handle(
-                new GetTicketsForOrderQuery(orderId), cancellationToken);
+            Result<IReadOnlyCollection<TicketResponse>> result = await sender.Send(
+                new GetTicketsForOrderQuery(orderId));
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })

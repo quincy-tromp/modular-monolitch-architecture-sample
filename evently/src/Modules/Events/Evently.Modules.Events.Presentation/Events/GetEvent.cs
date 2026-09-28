@@ -1,8 +1,8 @@
-﻿using Evently.Common.Application.Messaging;
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Common.Presentation.Endpoints;
 using Evently.Common.Presentation.Results;
 using Evently.Modules.Events.Application.Events.GetEvent;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -14,12 +14,9 @@ internal sealed class GetEvent : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
 
-        app.MapGet("events/{id}",async (
-            Guid id,
-            IQueryHandler<GetEventQuery,EventResponse> handler,
-            CancellationToken cancellationToken) =>
+        app.MapGet("events/{id}", async (Guid id, ISender sender) =>
         {
-            Result<EventResponse> result = await handler.Handle(new GetEventQuery(id), cancellationToken);
+            Result<EventResponse> result = await sender.Send(new GetEventQuery(id));
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })

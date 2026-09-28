@@ -1,8 +1,8 @@
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Modules.Events.Application.TicketTypes.UpdateTicketTypePrice;
 using Evently.Modules.Events.Domain.TicketTypes;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Events.IntegrationTests.TicketTypes;
 
@@ -20,7 +20,7 @@ public class UpdateTicketTypeTests : BaseIntegrationTest
         var command = new UpdateTicketTypePriceCommand(Guid.NewGuid(), Faker.Random.Decimal());
 
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.Error.Should().Be(TicketTypeErrors.NotFound(command.TicketTypeId));
@@ -30,17 +30,16 @@ public class UpdateTicketTypeTests : BaseIntegrationTest
     public async Task Should_ReturnSuccess_WhenTicketTypeExists()
     {
         // Arrange
-        Guid categoryId = await this.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await this.CreateEventAsync(categoryId);
-        Guid ticketTypeId = await this.CreateTicketTypeAsync(eventId);
+        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await Sender.CreateEventAsync(categoryId);
+        Guid ticketTypeId = await Sender.CreateTicketTypeAsync(eventId);
 
         var command = new UpdateTicketTypePriceCommand(ticketTypeId, Faker.Random.Decimal());
 
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
     }
 }
-

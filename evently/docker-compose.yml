@@ -12,7 +12,7 @@ services:
       - 5001:8081
 
   evently.database:
-    image: postgres:17
+    image: postgres:latest
     container_name: Evently.Database
     environment:
       - POSTGRES_DB=evently
@@ -24,7 +24,7 @@ services:
       - 5432:5432
 
   evently.identity:
-    image: quay.io/keycloak/keycloak:26.5.1
+    image: quay.io/keycloak/keycloak:latest
     container_name: Evently.Identity
     command: start-dev --import-realm
     environment:
@@ -36,15 +36,12 @@ services:
       - ./.files:/opt/keycloak/data/import
     ports:
       - 18080:8080
-      - 9000:9000
-    user: root # Required to set volume permissions
 
   evently.seq:
-    image: datalust/seq:2025.2
+    image: datalust/seq:latest
     container_name: Evently.Seq
     environment:
       - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_NOAUTHENTICATION=true # local dev only
     ports:
       - 5341:5341
       - 8081:80
@@ -64,16 +61,13 @@ services:
       - 4318:4318
       - 16686:16686
 
-  evently.queue:
-    image: rabbitmq:4.2.4-management-alpine
-    container_name: Evently.Queue
-    hostname: evently-queue
-    volumes:
-        - ./.containers/queue/data/:/var/lib/rabbitmq
-        - ./.containers/queue/log/:/var/log/rabbitmq
+  evently.mongo:
+    image: mongo:latest
+    container_name: Evently.Mongo
     environment:
-        RABBITMQ_DEFAULT_USER: guest
-        RABBITMQ_DEFAULT_PASS: guest
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    volumes:
+      - ./.containers/mongo:/data/db
     ports:
-      - 5672:5672
-      - 15672:15672
+      - 27017:27017

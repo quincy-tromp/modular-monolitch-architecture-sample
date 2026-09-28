@@ -1,3 +1,6 @@
-﻿namespace Evently.Common.Application.Messaging;
+﻿using Evently.Common.Domain;
+using MediatR;
 
-public interface IQuery<TResponse>;
+namespace Evently.Common.Application.Messaging;
+
+public interface IQuery<TResponse> : IRequest<Result<TResponse>>;

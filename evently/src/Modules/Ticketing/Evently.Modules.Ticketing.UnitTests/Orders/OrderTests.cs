@@ -1,8 +1,8 @@
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Modules.Ticketing.Domain.Customers;
 using Evently.Modules.Ticketing.Domain.Orders;
 using Evently.Modules.Ticketing.UnitTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Ticketing.UnitTests.Orders;
 
@@ -72,4 +72,3 @@ public class OrderTests : BaseTest
         domainEvent.OrderId.Should().Be(result.Value.Id);
     }
 }
-

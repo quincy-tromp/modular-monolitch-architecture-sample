@@ -1,7 +1,7 @@
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Modules.Events.Domain.Categories;
 using Evently.Modules.Events.UnitTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Events.UnitTests.Categories;
 
@@ -46,7 +46,7 @@ public class CategoryTests : BaseTest
         Category category = result.Value;
         category.ClearDomainEvents();
 
-        string newName = $"New {category.Name}";
+        string newName = Faker.Music.Genre();
 
         //Act
         category.ChangeName(newName);
@@ -58,4 +58,3 @@ public class CategoryTests : BaseTest
         domainEvent.CategoryId.Should().Be(category.Id);
     }
 }
-

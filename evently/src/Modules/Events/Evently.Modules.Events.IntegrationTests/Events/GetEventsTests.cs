@@ -1,7 +1,7 @@
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Modules.Events.Application.Events.GetEvents;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Events.IntegrationTests.Events;
 
@@ -21,8 +21,7 @@ public class GetEventsTests : BaseIntegrationTest
         var query = new GetEventsQuery();
 
         // Act
-        Result<IReadOnlyCollection<EventResponse>> result =
-            await SendQuery<GetEventsQuery, IReadOnlyCollection<EventResponse>>(query);
+        Result<IReadOnlyCollection<EventResponse>> result = await Sender.Send(query);
 
         // Assert
         result.Value.Should().BeEmpty();
@@ -34,19 +33,17 @@ public class GetEventsTests : BaseIntegrationTest
         // Arrange
         await CleanDatabaseAsync();
 
-        Guid categoryId = await this.CreateCategoryAsync(Faker.Music.Genre());
+        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
 
-        await this.CreateEventAsync(categoryId);
-        await this.CreateEventAsync(categoryId);
+        await Sender.CreateEventAsync(categoryId);
+        await Sender.CreateEventAsync(categoryId);
 
         var query = new GetEventsQuery();
 
         // Act
-        Result<IReadOnlyCollection<EventResponse>> result =
-            await SendQuery<GetEventsQuery, IReadOnlyCollection<EventResponse>>(query);
+        Result<IReadOnlyCollection<EventResponse>> result = await Sender.Send(query);
 
         // Assert
         result.Value.Should().HaveCount(2);
     }
 }
-

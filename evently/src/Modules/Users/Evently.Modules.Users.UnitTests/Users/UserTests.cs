@@ -1,6 +1,6 @@
-using Evently.Modules.Users.Domain.Users;
+﻿using Evently.Modules.Users.Domain.Users;
 using Evently.Modules.Users.UnitTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 
 namespace Evently.Modules.Users.UnitTests.Users;
 
@@ -92,4 +92,3 @@ public class UserTests : BaseTest
         user.DomainEvents.Should().BeEmpty();
     }
 }
-

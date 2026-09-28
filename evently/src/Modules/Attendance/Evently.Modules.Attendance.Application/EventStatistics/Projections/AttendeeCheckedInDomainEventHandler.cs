@@ -6,7 +6,9 @@ using Evently.Modules.Attendance.Domain.Attendees;
 
 namespace Evently.Modules.Attendance.Application.EventStatistics.Projections;
 
-internal sealed class AttendeeCheckedInDomainEventHandler(IDbConnectionFactory dbConnectionFactory)
+internal sealed class AttendeeCheckedInDomainEventHandler(
+    IDbConnectionFactory dbConnectionFactory,
+    IEventStatisticsRepository eventStatisticsRepository)
     : DomainEventHandler<AttendeeCheckedInDomainEvent>
 {
     public override async Task Handle(
@@ -17,16 +19,20 @@ internal sealed class AttendeeCheckedInDomainEventHandler(IDbConnectionFactory d
 
         const string sql =
             """
-            UPDATE attendance.event_statistics es
-            SET attendees_checked_in = (
-                SELECT COUNT(*)
-                FROM attendance.tickets t
-                WHERE
-                    t.event_id = es.event_id AND
-                    t.used_at_utc IS NOT NULL)
-            WHERE es.event_id = @EventId
+            SELECT COUNT(*)
+            FROM attendance.tickets t
+            WHERE
+                t.event_id = @EventId AND
+                t.used_at_utc IS NOT NULL
             """;
 
-        await connection.ExecuteAsync(sql, domainEvent);
+        int attendeeCount = await connection.ExecuteScalarAsync<int>(sql, domainEvent);
+
+        EventStatistics eventStatistics =
+            await eventStatisticsRepository.GetAsync(domainEvent.EventId, cancellationToken);
+
+        eventStatistics.AttendeesCheckedIn = attendeeCount;
+
+        await eventStatisticsRepository.ReplaceAsync(eventStatistics, cancellationToken);
     }
 }

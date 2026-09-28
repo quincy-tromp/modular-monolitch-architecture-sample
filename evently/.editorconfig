@@ -273,9 +273,6 @@ dotnet_diagnostic.CA1307.severity = none
 # CA1308: Normalize strings to uppercase
 dotnet_diagnostic.CA1308.severity = none
 
-# CA1515: Consider making public types internal
-dotnet_diagnostic.CA1515.severity = none
-
 # CA1700: Do not name enum values 'Reserved'
 dotnet_diagnostic.CA1700.severity = none
 
@@ -308,9 +305,6 @@ dotnet_diagnostic.CA1848.severity = none
 
 # CA1860: Avoid using 'Enumerable.Any()' extension method
 dotnet_diagnostic.CA1860.severity = none
-
-# CA1873: Avoid potentially expensive logging
-dotnet_diagnostic.CA1873.severity = none
 
 # CA2007: Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.CA2007.severity = none
@@ -350,17 +344,11 @@ dotnet_diagnostic.CS8618.severity = none
 
 # IDE Code Analyzers rules
 
-# IDE0032: Use auto property
-dotnet_diagnostic.IDE0032.severity = none
-
 # IDE0046: Convert to conditional expression
 dotnet_diagnostic.IDE0046.severity = none
 
 # IDE0053: Use expression body for lambda expression
 dotnet_diagnostic.IDE0053.severity = none
-
-# IDE0060: Remove unused parameter
-dotnet_diagnostic.IDE0060.severity = none
 
 # IDE0270: Use coalesce expression
 dotnet_diagnostic.IDE0270.severity = none
@@ -384,9 +372,6 @@ dotnet_diagnostic.S1144.severity = none
 
 # S2094: Classes should not be empty
 dotnet_diagnostic.S2094.severity = none
-
-# S2326: Unused type parameters should be removed
-dotnet_diagnostic.S2326.severity = none
 
 # S2365: Properties should not make collection or array copies
 dotnet_diagnostic.S2365.severity = none

@@ -66,9 +66,4 @@ public sealed class Order : Entity
 
         return Result.Success();
     }
-
-    public void Refund()
-    {
-        Status = OrderStatus.Refunded;
-    }
 }

@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 using Evently.Modules.Users.Application.Users.GetUser;
 using Evently.Modules.Users.IntegrationTests.Abstractions;
 using Evently.Modules.Users.Presentation.Users;
-using AwesomeAssertions;
+using FluentAssertions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Evently.Modules.Users.IntegrationTests.Users;
@@ -62,4 +62,3 @@ public class GetUserProfileTests : BaseIntegrationTest
         return accessToken;
     }
 }
-

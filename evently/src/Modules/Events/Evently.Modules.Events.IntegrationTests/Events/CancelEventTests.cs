@@ -1,8 +1,8 @@
-using Evently.Common.Domain;
+﻿using Evently.Common.Domain;
 using Evently.Modules.Events.Application.Events.CancelEvent;
 using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.IntegrationTests.Abstractions;
-using AwesomeAssertions;
+using FluentAssertions;
 using NSubstitute;
 
 namespace Evently.Modules.Events.IntegrationTests.Events;
@@ -23,7 +23,7 @@ public class CancelEventTests : BaseIntegrationTest
         var command = new CancelEventCommand(eventId);
 
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.Error.Should().Be(EventErrors.NotFound(eventId));
@@ -33,15 +33,15 @@ public class CancelEventTests : BaseIntegrationTest
     public async Task Should_ReturnFailure_WhenEventAlreadyCanceled()
     {
         // Arrange
-        Guid categoryId = await this.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await this.CreateEventAsync(categoryId);
+        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await Sender.CreateEventAsync(categoryId);
 
         var command = new CancelEventCommand(eventId);
 
-        await SendCommand(command);
+        await Sender.Send(command);
 
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.Error.Should().Be(EventErrors.AlreadyCanceled);
@@ -51,16 +51,16 @@ public class CancelEventTests : BaseIntegrationTest
     public async Task Should_ReturnFailure_WhenEventAlreadyStarted()
     {
         // Arrange
-        Guid categoryId = await this.CreateCategoryAsync(Faker.Music.Genre());
+        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
 
-        Guid eventId = await this.CreateEventAsync(categoryId, DateTime.UtcNow.AddMinutes(5));
+        Guid eventId = await Sender.CreateEventAsync(categoryId, DateTime.UtcNow.AddMinutes(5));
 
         Factory.DateTimeProviderMock.UtcNow.Returns(DateTime.UtcNow.AddMinutes(15));
 
         var command = new CancelEventCommand(eventId);
 
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.Error.Should().Be(EventErrors.AlreadyStarted);
@@ -72,16 +72,15 @@ public class CancelEventTests : BaseIntegrationTest
     public async Task Should_ReturnSuccess_WhenEventIsCanceled()
     {
         // Arrange
-        Guid categoryId = await this.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await this.CreateEventAsync(categoryId);
+        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await Sender.CreateEventAsync(categoryId);
 
         var command = new CancelEventCommand(eventId);
 
         // Act
-        Result result = await SendCommand(command);
+        Result result = await Sender.Send(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
     }
 }
-

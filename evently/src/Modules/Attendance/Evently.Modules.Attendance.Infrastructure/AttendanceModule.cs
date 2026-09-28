@@ -4,6 +4,7 @@ using Evently.Common.Infrastructure.Outbox;
 using Evently.Common.Presentation.Endpoints;
 using Evently.Modules.Attendance.Application.Abstractions.Authentication;
 using Evently.Modules.Attendance.Application.Abstractions.Data;
+using Evently.Modules.Attendance.Application.EventStatistics;
 using Evently.Modules.Attendance.Domain.Attendees;
 using Evently.Modules.Attendance.Domain.Events;
 using Evently.Modules.Attendance.Domain.Tickets;
@@ -14,12 +15,15 @@ using Evently.Modules.Attendance.Infrastructure.Events;
 using Evently.Modules.Attendance.Infrastructure.Inbox;
 using Evently.Modules.Attendance.Infrastructure.Outbox;
 using Evently.Modules.Attendance.Infrastructure.Tickets;
+using Evently.Modules.Events.IntegrationEvents;
+using Evently.Modules.Ticketing.IntegrationEvents;
+using Evently.Modules.Users.IntegrationEvents;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Wolverine;
 
 namespace Evently.Modules.Attendance.Infrastructure;
 
@@ -40,13 +44,13 @@ public static class AttendanceModule
         return services;
     }
 
-    public static void ConfigureWolverine(WolverineOptions options)
+    public static void ConfigureConsumers(IRegistrationConfigurator registrationConfigurator)
     {
-        options.Discovery.IncludeType<UserRegisteredIntegrationEventConsumer>();
-        options.Discovery.IncludeType<UserProfileUpdatedIntegrationEventConsumer>();
-        options.Discovery.IncludeType<EventPublishedIntegrationEventConsumer>();
-        options.Discovery.IncludeType<TicketIssuedIntegrationEventConsumer>();
-        options.Discovery.IncludeType<EventCancellationStartedIntegrationEventConsumer>();
+        registrationConfigurator.AddConsumer<IntegrationEventConsumer<UserRegisteredIntegrationEvent>>();
+        registrationConfigurator.AddConsumer<IntegrationEventConsumer<UserProfileUpdatedIntegrationEvent>>();
+        registrationConfigurator.AddConsumer<IntegrationEventConsumer<EventPublishedIntegrationEvent>>();
+        registrationConfigurator.AddConsumer<IntegrationEventConsumer<TicketIssuedIntegrationEvent>>();
+        registrationConfigurator.AddConsumer<IntegrationEventConsumer<EventCancellationStartedIntegrationEvent>>();
     }
 
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
@@ -65,6 +69,7 @@ public static class AttendanceModule
         services.AddScoped<IAttendeeRepository, AttendeeRepository>();
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<ITicketRepository, TicketRepository>();
+        services.AddScoped<IEventStatisticsRepository, EventStatisticsRepository>();
 
         services.AddScoped<IAttendanceContext, AttendanceContext>();
 

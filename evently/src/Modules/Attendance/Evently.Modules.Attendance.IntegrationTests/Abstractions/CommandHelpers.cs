@@ -1,19 +1,19 @@
-using Bogus;
-using Evently.Common.Application.Messaging;
+﻿using Bogus;
 using Evently.Common.Domain;
 using Evently.Modules.Attendance.Application.Attendees.CreateAttendee;
 using Evently.Modules.Attendance.Application.Events.CreateEvent;
 using Evently.Modules.Attendance.Application.Tickets.CreateTicket;
-using AwesomeAssertions;
+using FluentAssertions;
+using MediatR;
 
 namespace Evently.Modules.Attendance.IntegrationTests.Abstractions;
 
 internal static class CommandHelpers
 {
-    internal static async Task<Guid> CreateAttendeeAsync(this BaseIntegrationTest test, Guid attendeeId)
+    internal static async Task<Guid> CreateAttendeeAsync(this ISender sender, Guid attendeeId)
     {
         var faker = new Faker();
-        Result result = await test.SendCommand(
+        Result result = await sender.Send(
             new CreateAttendeeCommand(
                 attendeeId, 
                 faker.Internet.Email(),
@@ -26,12 +26,12 @@ internal static class CommandHelpers
     }
 
     internal static async Task<Guid> CreateTicketAsync(
-        this BaseIntegrationTest test,
+        this ISender sender,
         Guid ticketId,
         Guid attendeeId,
         Guid eventId)
     {
-        Result result = await test.SendCommand(
+        Result result = await sender.Send(
             new CreateTicketCommand(
                 ticketId,
                 attendeeId,
@@ -43,10 +43,10 @@ internal static class CommandHelpers
         return ticketId;
     }
 
-    internal static async Task<Guid> CreateEventAsync(this BaseIntegrationTest test, Guid eventId)
+    internal static async Task<Guid> CreateEventAsync(this ISender sender, Guid eventId)
     {
         var faker = new Faker();
-        Result result = await test.SendCommand(
+        Result result = await sender.Send(
             new CreateEventCommand(
                 eventId, 
                 faker.Music.Genre(),
@@ -60,4 +60,3 @@ internal static class CommandHelpers
         return eventId; 
     }
 }
-
